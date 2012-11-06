@@ -57,6 +57,27 @@ def xmlrpc(project, port=6942, verbosity=0):
     except KeyboardInterrupt:
         log.info('Keyboard interrupt')
 
+@baker.command(
+    default=True,
+    params={
+        'project': 'The directory containing the project to server.',
+        'verbosity': 'Verbosity level (0=normal, 1=info, 2=debug).',
+    },
+    shortopts={
+        'verbosity': 'v',
+    })
+def dbus(project, verbosity=0):
+    init_logging(verbosity)
+
+    log_basic_info()
+
+    log.info(
+        'Running traad dbus server for project "{}".'.format(
+            os.path.abspath(project)))
+
+    rope_if = RopeInterface(project)
+
+
 def main():
     baker.run()
 
