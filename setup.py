@@ -31,6 +31,7 @@ setup(
 
     install_requires=[
         'baker',
+        'dbus-python',
         'decorator',
         rope_lib,
     ],
