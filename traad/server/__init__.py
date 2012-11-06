@@ -1,0 +1,1 @@
+from traad.server.main import main
