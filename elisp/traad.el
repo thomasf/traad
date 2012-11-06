@@ -77,7 +77,7 @@
   :type '(string)
   :group 'traad)
 
-(defcustom traad-server-args (list "-V" "2")
+(defcustom traad-server-args (list "xmlrpc" "-v" "2")
   "Parameters passed to the traad server before the directory name."
   :type '(list)
   :group 'traad)
@@ -113,6 +113,7 @@ after successful refactorings."
 	 (args (append traad-server-args (list directory)))
 	 (program+args (append program args))
 	 (default-directory "~/"))
+    (message (format "traad command line: %s" program+args))
     (apply #'start-process "traad-server" "*traad-server*" program+args)))
 
 (defun traad-close ()

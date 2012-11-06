@@ -30,6 +30,7 @@ setup(
         },
 
     install_requires=[
+        'baker',
         'decorator',
         rope_lib,
     ],

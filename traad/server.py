@@ -1,14 +1,48 @@
 import logging
+import os
+import sys
+
+import baker
 
 from .rope_interface import RopeInterface
-from .xmlrpc import SimpleXMLRPCServer
 
 log = logging.getLogger(__name__)
 
-def run_server(port, project):
+def init_logging(verbosity):
+    level = {
+        0: logging.WARNING,
+        1: logging.INFO,
+        2: logging.DEBUG
+    }[verbosity]
+
+    logging.basicConfig(
+        level=level)
+
+def log_basic_info():
+    log.info('Python version: {}'.format(sys.version))
+
+@baker.command(
+    default=True,
+    params={
+        'port': 'The port on which the server will listen.',
+        'project': 'The directory containing the project to server.',
+        'verbosity': 'Verbosity level (0=normal, 1=info, 2=debug).',
+    },
+    shortopts={
+        'port': 'p',
+        'verbosity': 'v',
+    })
+def xmlrpc(project, port=6942, verbosity=0):
+    from .xmlrpc import SimpleXMLRPCServer
+
+    init_logging(verbosity)
+
+    log_basic_info()
+
     log.info(
-        'Running traad server for project "{}" on port {}'.format(
-            project, port))
+        'Running traad xmlrpc server for project "{}" on port {}'.format(
+            os.path.abspath(project),
+            port))
 
     server = SimpleXMLRPCServer(
         ('127.0.0.1', port),
@@ -18,44 +52,13 @@ def run_server(port, project):
     server.register_instance(
         RopeInterface(project))
 
-    server.serve_forever()
-
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Run a traad server.')
-
-    parser.add_argument(
-        '-p, --port', metavar='N', type=int,
-        dest='port', default=6942,
-        help='the port on which the server will listen')
-
-    parser.add_argument(
-        '-V, --verbosity', metavar='N', type=int,
-        dest='verbosity', default=0,
-        help='Verbosity level (0=normal, 1=info, 2=debug).')
-
-    parser.add_argument(
-        'project', metavar='P', type=str,
-        help='the directory containing the project to serve')
-
-    args = parser.parse_args()
-
-    # Configure logging
-    level = {
-        0: logging.WARNING,
-        1: logging.INFO,
-        2: logging.DEBUG
-    }[args.verbosity]
-
-    logging.basicConfig(
-        level=level)
-
     try:
-        run_server(args.port, args.project)
+        server.serve_forever()
     except KeyboardInterrupt:
         log.info('Keyboard interrupt')
+
+def main():
+    baker.run()
 
 if __name__ == '__main__':
     main()
